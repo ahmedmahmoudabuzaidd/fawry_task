@@ -1,0 +1,8 @@
+If we were to support **regex** or additional options like `-i`, `-c`, and `-l`, we would:
+
+- Extend the `getopts` option string (e.g., `getopts ":nviclE"`).  
+- Add corresponding case blocks to set variables for regex (`-E`), case-insensitive (`-i`), count (`-c`), and list files (`-l`).  
+- Append these flags to the `grep_options` string.  
+- Update the `print_usage` function to document the new options.  
+
+The overall structure—parse options, shift, validate arguments, and invoke `grep`—remains the same, making it easy to scale with more flags.
