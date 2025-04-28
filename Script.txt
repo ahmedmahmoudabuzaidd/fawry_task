@@ -1,0 +1,79 @@
+#!/bin/bash
+# Make sure the script runs with bash
+show_line_numbers=false
+invert_match=false
+
+# Function to print usage information
+print_usage() {
+  echo "Usage: $0 [-n] [-v] <search_string> <file>"
+  echo
+  echo "Options:"
+  echo " -n Show line numbers for each match"
+  echo " -v Invert the match (show lines that do NOT match)"
+  echo " --help Show this help message"
+  echo
+  echo "Examples:"
+  echo " ./mygrep.sh \"hello\" myfile.txt # Normal search"
+  echo " ./mygrep.sh -n \"hello\" myfile.txt # Search with line numbers"
+  echo " ./mygrep.sh -v \"hello\" myfile.txt # Inverted match"
+  echo " ./mygrep.sh -nv \"hello\" myfile.txt # Inverted match with line numbers"
+}
+
+# Handle --help before getopts
+if [[ "$1" == "--help" ]]; then
+  print_usage
+  exit 0
+fi
+
+# Parse options with getopts
+while getopts ":nv" opt; do
+  case $opt in
+    n)
+      show_line_numbers=true
+      ;;
+    v)
+      invert_match=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      print_usage
+      exit 2
+      ;;
+  esac
+done
+
+# Shift options away
+shift $((OPTIND - 1))
+
+# Check for exactly two arguments
+if [[ $# -ne 2 ]]; then
+  echo "Error: Missing arguments." >&2
+  print_usage
+  exit 2
+fi
+
+search_string=$1
+file=$2
+
+# Debug output to check values of search_string and file
+echo "Search string: $search_string"
+echo "File: $file"
+
+# Check if the file exists and is readable
+if [[ ! -f "$file" ]]; then
+  echo "$0: $file: No such file" >&2
+  exit 2
+fi
+
+# Build grep options as an array
+grep_options=("-i")
+if $show_line_numbers; then
+  grep_options+=("-n")
+fi
+if $invert_match; then
+  grep_options+=("-v")
+fi
+
+# Perform the search using grep
+grep "${grep_options[@]}" -- "$search_string" "$file"
+exit $?
