@@ -1,0 +1,27 @@
+# Breakdown of Script Argument and Option Handling
+
+1. **Help Flag (`--help`)**:  
+   If the first argument is `--help`, the script calls the `print_usage` function to display usage information and exits, **before** option parsing.
+
+2. **Options Parsing with `getopts`**:  
+   Uses `getopts ":nv"` to process `-n` and `-v` flags.  
+   - `-n` sets `show_line_numbers=true`.  
+   - `-v` sets `invert_match=true`.  
+   Invalid options trigger an error message and display usage.
+
+3. **Shifting Options**:  
+   `shift $((OPTIND -1))` removes parsed options, leaving only positional arguments (`<search_string>` and `<file>`).
+
+4. **Arguments Validation**:  
+   Checks that exactly two arguments remain. If not, prints an error and usage info, then exits.
+
+5. **File Existence Check**:  
+   Verifies the given file exists and is a regular file (`-f`). If missing, prints “No such file” error and exits.
+
+6. **Building `grep` Options**:  
+   Constructs a string of `grep` flags based on the parsed options:  
+   - `-n` for line numbers.  
+   - `-v` for invert match.
+
+7. **Executing `grep`**:  
+   Calls `grep` with the constructed flags, the search string, and the file, then exits with grep's status code.
